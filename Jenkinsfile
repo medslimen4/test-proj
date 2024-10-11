@@ -10,6 +10,29 @@ pipeline {
     APP_NAME = 'test-proj'
   }
   stages {
+    stage('Verify Docker') {
+      steps {
+        powershell 'docker version'
+      }
+    }
+    stage('Check Heroku Connectivity') {
+      steps {
+        powershell 'Test-NetConnection registry.heroku.com -Port 443'
+      }
+    }
+    stage('Verify Heroku CLI') {
+      steps {
+        powershell 'heroku --version'
+      }
+    }
+    stage('Debug') {
+      steps {
+        powershell '''
+          Write-Host "HEROKU_API_KEY is set: $(-not [string]::IsNullOrEmpty($Env:HEROKU_API_KEY))"
+          Write-Host "First 4 characters of HEROKU_API_KEY: $($Env:HEROKU_API_KEY.Substring(0,4))"
+        '''
+      }
+    }
     stage('Build') {
       steps {
         powershell 'docker build -t $Env:IMAGE_NAME:$Env:IMAGE_TAG .'
@@ -17,7 +40,21 @@ pipeline {
     }
     stage('Login') {
       steps {
-        powershell 'echo $Env:HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com'
+        powershell '''
+          try {
+            $apiKey = $Env:HEROKU_API_KEY
+            if ([string]::IsNullOrEmpty($apiKey)) {
+              throw "HEROKU_API_KEY is empty or not set"
+            }
+            echo $apiKey | docker login --username=_ --password-stdin registry.heroku.com
+            if ($LASTEXITCODE -ne 0) {
+              throw "Docker login failed with exit code $LASTEXITCODE"
+            }
+          } catch {
+            Write-Error "Error during login: $_"
+            exit 1
+          }
+        '''
       }
     }
     stage('Push to Heroku registry') {
