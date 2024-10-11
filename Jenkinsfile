@@ -42,18 +42,19 @@ pipeline {
       steps {
         powershell '''
           try {
-            $apiKey = $Env:HEROKU_API_KEY
-            if ([string]::IsNullOrEmpty($apiKey)) {
-              throw "HEROKU_API_KEY is empty or not set"
-            }
-            echo $apiKey | docker login --username=_ --password-stdin registry.heroku.com
-            if ($LASTEXITCODE -ne 0) {
-              throw "Docker login failed with exit code $LASTEXITCODE"
-            }
-          } catch {
-            Write-Error "Error during login: $_"
-            exit 1
-          }
+  $apiKey = $Env:HEROKU_API_KEY
+  if ([string]::IsNullOrEmpty($apiKey)) {
+    throw "HEROKU_API_KEY is empty or not set"
+  }
+  Write-Host "Attempting Docker login with Heroku API key..."
+  echo $apiKey | docker login --username=_ --password-stdin registry.heroku.com
+  if ($LASTEXITCODE -ne 0) {
+    throw "Docker login failed with exit code $LASTEXITCODE"
+  }
+} catch {
+  Write-Error "Error during login: $_"
+  exit 1
+}
         '''
       }
     }
