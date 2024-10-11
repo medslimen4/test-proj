@@ -4,27 +4,27 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    IMAGE_NAME = 'medslimen4/test-proj'
+    HEROKU_API_KEY = credentials('heroku-api-key')
+    IMAGE_NAME = 'medslimen12/test-proj'
     IMAGE_TAG = 'latest'
     APP_NAME = 'test-proj'
   }
   stages {
+
+       stage('Login') {
+      steps {
+        sh 'echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com'
+      }
+    }
     stage('Build') {
       steps {
-        powershell 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+        sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
       }
     }
-    stage('Login') {
-      steps {
-        powershell '''
-          $token = & heroku auth:token
-          echo $token | docker login --username=_ --password-stdin registry.heroku.com
-        '''
-      }
-    }
+ 
     stage('Push to Heroku registry') {
       steps {
-        powershell '''
+        sh '''
           docker tag $IMAGE_NAME:$IMAGE_TAG registry.heroku.com/$APP_NAME/web
           docker push registry.heroku.com/$APP_NAME/web
         '''
@@ -32,13 +32,15 @@ pipeline {
     }
     stage('Release the image') {
       steps {
-        powershell 'heroku container:release web --app=$APP_NAME'
+        sh '''
+          heroku container:release web --app=$APP_NAME
+        '''
       }
     }
   }
   post {
     always {
-      powershell 'docker logout'
+      sh 'docker logout'
     }
   }
 }
