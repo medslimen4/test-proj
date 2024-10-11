@@ -5,7 +5,7 @@ pipeline {
   }
   environment {
     HEROKU_API_KEY = credentials('heroku-api-key')
-    IMAGE_NAME = 'darinpope/test-proj'
+    IMAGE_NAME = 'medslimen/test-proj'
     IMAGE_TAG = 'latest'
     APP_NAME = 'test-proj'
   }
