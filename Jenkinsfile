@@ -19,7 +19,7 @@ pipeline {
       steps {
         bat """
           @echo off
-          echo heroku auth:token | docker login --username=_ registry.heroku.com --password-stdin
+          echo %HEROKU_API_KEY% | docker login --username=_ --password-stdin registry.heroku.com
         """
       }
     }
