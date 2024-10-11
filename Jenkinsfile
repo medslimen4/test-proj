@@ -19,7 +19,6 @@ pipeline {
       steps {
         bat """
           @echo off
-          echo heroku container:login
           echo heroku auth:token | docker login --username=_ registry.heroku.com --password-stdin
         """
       }
