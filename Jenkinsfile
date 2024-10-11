@@ -62,6 +62,9 @@ pipeline {
         powershell '''
           docker tag $Env:IMAGE_NAME:$Env:IMAGE_TAG registry.heroku.com/$Env:APP_NAME/web
           docker push registry.heroku.com/$Env:APP_NAME/web
+          if ($LASTEXITCODE -ne 0) {
+            throw "Docker push failed with exit code $LASTEXITCODE"
+          }
         '''
       }
     }
