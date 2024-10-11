@@ -26,14 +26,11 @@ pipeline {
         script {
           if (isUnix()) {
             sh '''
-              # For testing only - replace with your actual API key
-              HEROKU_API_KEY=HRKU-9d4551b7-316f-40d0-80a9-c6b39490274d
               echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
             '''
           } else {
             bat '''
-              @REM For testing only - replace with your actual API key
-              set HEROKU_API_KEY=your_api_key_here
+              @echo off
               echo %HEROKU_API_KEY% | docker login --username=_ --password-stdin registry.heroku.com
             '''
           }
