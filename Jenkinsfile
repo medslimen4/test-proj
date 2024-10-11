@@ -4,7 +4,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    HEROKU_API_KEY = credentials('base64:VZOs8OpED9AIzoA3f/ZxOvnA0wkhxWIzhvHAXDzXIOw=')
+    HEROKU_API_KEY = credentials('heroku-api-key')
     IMAGE_NAME = 'test-proj'
     IMAGE_TAG = 'latest'
     APP_NAME = 'test-proj'
