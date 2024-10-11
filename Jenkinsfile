@@ -42,7 +42,8 @@ pipeline {
                           throw "HEROKU_API_KEY is empty or not set"
                       }
                       Write-Host "Attempting Docker login with Heroku API key..."
-                      echo $apiKey | docker login --username=_ --password-stdin registry.heroku.com
+                      echo docker login --username=_ --password=$(heroku auth:token) registry.heroku.com
+
                       if ($LASTEXITCODE -ne 0) {
                           throw "Docker login failed with exit code $LASTEXITCODE"
                       }
