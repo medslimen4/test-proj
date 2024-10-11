@@ -16,9 +16,9 @@ pipeline {
     }
     stage('Login') {
       steps {
-        withCredentials([string(credentialsId: 'heroku-api-key', variable: 'HEROKU_API_KEY')]) {
-          sh 'echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com'
-        }
+        sh '''
+          docker login --username=_ --password=$(heroku auth:token) registry.heroku.com
+        '''
       }
     }
     stage('Push to Heroku registry') {
